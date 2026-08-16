@@ -1,0 +1,202 @@
+[ WARN:0@0.029] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[ WARN:0@0.131] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+
+========================================
+       FACE AUTHENTICATION
+========================================
+
+Challenge: LEFT
+
+Similarity: 0.7603
+
+========================================
+       AUTHENTICATION SUCCESS
+       USER: DILIP
+========================================
+
+
+[ WARN:0@0.073] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[ WARN:0@0.271] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+qt.qpa.xcb: could not connect to display 
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "/home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+Available platform plugins are: xcb.
+
+
+[ WARN:0@0.031] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[ WARN:0@0.144] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QFontDatabase: Cannot find font directory /home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+
+========================================
+       FACE AUTHENTICATION
+========================================
+
+Challenge: RIGHT
+
+Similarity: 0.6100
+
+========================================
+       AUTHENTICATION SUCCESS
+       USER: DILIP
+========================================
+
+
+[ WARN:0@0.029] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[ WARN:0@0.132] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+qt.qpa.xcb: could not connect to display 
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "/home/dk/face_unlock/.venv/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+Available platform plugins are: xcb.
+
+
+
+--- PAM AUTH ATTEMPT ---
+[ WARN:0@0.025] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[ WARN:0@0.129] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+Challenge: LEFT
+LIVENESS PASSED
+Similarity: 0.8400
+AUTHENTICATION SUCCESS
+
+Exit code: 0
+
+--- PAM AUTH ATTEMPT ---
+[ WARN:0@0.077] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+[ WARN:0@0.292] global net_impl_backend.cpp:345 setPreferableTarget Targets are not supported by the new graph engine for now
+Challenge: LEFT
+LIVENESS PASSED
+Similarity: 0.8897
+AUTHENTICATION SUCCESS
+
+Exit code: 0
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: FAIL
+PAM FACE AUTH: FAILED
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: FAIL
+PAM FACE AUTH: FAILED
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS
+
+--- PAM AUTH REQUEST ---
+Connecting to /run/face-unlock/face-unlock.sock
+Service response: SUCCESS
+PAM FACE AUTH: SUCCESS

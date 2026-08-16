@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+
+import socket
+import sys
+
+SOCKET_PATH = "/run/face-unlock/face-unlock.sock"
+TIMEOUT = 15
+
+LOG_FILE = "/home/dk/face_unlock/logs/pam_auth.log"
+
+
+def log(message):
+
+    try:
+
+        with open(LOG_FILE, "a") as log:
+
+            log.write(message + "\n")
+
+    except Exception:
+        pass
+
+
+def authenticate():
+
+    try:
+
+        log("\n--- PAM AUTH REQUEST ---")
+
+        with socket.socket(
+            socket.AF_UNIX,
+            socket.SOCK_STREAM
+        ) as sock:
+
+            sock.settimeout(TIMEOUT)
+
+            log(
+                f"Connecting to {SOCKET_PATH}"
+            )
+
+            sock.connect(SOCKET_PATH)
+
+            sock.sendall(
+                b"AUTHENTICATE\n"
+            )
+
+            response = sock.recv(
+                1024
+            ).decode().strip()
+
+            log(
+                f"Service response: {response}"
+            )
+
+            if response == "SUCCESS":
+
+                log(
+                    "PAM FACE AUTH: SUCCESS"
+                )
+
+                return True
+
+            log(
+                "PAM FACE AUTH: FAILED"
+            )
+
+            return False
+
+    except Exception as e:
+
+        log(
+            f"PAM SOCKET ERROR: {e}"
+        )
+
+        return False
+
+
+if authenticate():
+
+    sys.exit(0)
+
+else:
+
+    sys.exit(1)
