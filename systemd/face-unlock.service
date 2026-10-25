@@ -1,0 +1,21 @@
+[Unit]
+Description=Face Unlock Authentication Service
+Wants=dev-video0.device
+After=local-fs.target dev-video0.device
+Before=display-manager.service
+
+[Service]
+Type=simple
+User=dk
+Group=faceauth
+SupplementaryGroups=video
+WorkingDirectory=/home/dk/face_unlock
+ExecStart=/home/dk/face_unlock/.venv/bin/python /home/dk/face_unlock/src/face_service.py
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=face-unlock
+RuntimeDirectoryMode=0750
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

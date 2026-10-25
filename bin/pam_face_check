@@ -2,6 +2,7 @@
 
 import socket
 import sys
+import os
 
 SOCKET_PATH = "/run/face-unlock/face-unlock.sock"
 TIMEOUT = 15
@@ -22,6 +23,18 @@ def log(message):
 
 
 def authenticate():
+
+    # Face matching is enrolled for dk only. Other PAM users must use the
+    # normal password stack instead of inheriting this user's face identity.
+    pam_user = os.environ.get("PAM_USER", "dk")
+
+    if pam_user != "dk":
+
+        log(
+            f"Skipping face auth for PAM user: {pam_user}"
+        )
+
+        return False
 
     try:
 

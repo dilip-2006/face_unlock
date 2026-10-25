@@ -1,6 +1,6 @@
 # Face Unlock for Ubuntu 22.04
 
-A custom AI-powered face authentication system for Ubuntu 22.04 LTS using OpenCV YuNet, SFace, camera-based face recognition, liveness challenges, PAM integration, a background systemd service, Unix domain socket IPC, and a GNOME Shell glassmorphism interface.
+A custom AI-powered face authentication system for Ubuntu 22.04 LTS using OpenCV YuNet, SFace, camera-based similarity matching, PAM integration, a background systemd service, Unix domain socket IPC, and a GNOME Shell glassmorphism interface.
 
 The system is designed to provide a native-feeling face-unlock experience for Ubuntu while preserving traditional password authentication as a safe fallback.
 
@@ -12,7 +12,7 @@ The system is designed to provide a native-feeling face-unlock experience for Ub
 - **128-Dimensional Face Embeddings**: Feature extraction using OpenCV SFace (`face_recognition_sface_2021dec.onnx`).
 - **Multiple-Frame Face Enrollment**: Captures up to 40 frames during enrollment to generate a robust reference embedding.
 - **Cosine-Similarity Matching**: High-precision vector similarity comparison with configurable confidence thresholds.
-- **Liveness Verification**: Active/passive directional movement verification to prevent photo and static-display spoofing.
+- **Similarity-Based Identity Matching**: Live camera embeddings are compared with the enrolled SFace embedding.
 - **PAM Integration**: Pluggable Authentication Module wrapper (`pam_exec.so`) bridging system authentication with the face service.
 - **GNOME Login Authentication**: Integrated with GDM (`/etc/pam.d/gdm-password`).
 - **GNOME Lock-Screen Authentication**: Unlocks the lock screen automatically upon face verification.
@@ -89,8 +89,7 @@ The system is designed to provide a native-feeling face-unlock experience for Ub
                              │
                              ▼
                 ┌─────────────────────────┐
-                │     Liveness Check      │
-                │       LEFT / RIGHT      │
+                │ Similarity Threshold    │
                 └────────────┬────────────┘
                              │
                 ┌────────────┴────────────┐
@@ -367,17 +366,9 @@ python src/recognize.py
 
 ---
 
-## 9. Liveness Detection
+## 9. Identity Matching
 
-To eliminate static photograph spoofing, the system incorporates real-time movement analysis:
-
-- **Nose-to-Eye Normalization**: Calculates normalized nose position relative to inter-pupillary distance.
-- **Directional Challenges**: Evaluates head turning (`LEFT` / `RIGHT`) or natural passive movement delta ($\ge 0.08$).
-
-Test liveness detection standalone:
-```bash
-python src/liveness.py
-```
+Unlock authentication uses SFace embeddings and cosine similarity against the enrolled `face_embedding.npy` template. Directional LEFT/RIGHT challenges are not part of the unlock decision.
 
 ---
 
@@ -395,7 +386,7 @@ python src/auth_engine_headless.py
 
 ## 11. PAM Wrapper Script
 
-The executable PAM wrapper `~/face_unlock/bin/pam_face_check` connects to the running face service Unix socket, sends `AUTHENTICATE`, waits for response, and logs details to `~/face_unlock/logs/pam_auth.log`.
+The executable PAM wrapper `~/face_unlock/bin/pam_face_check` connects to the running face service Unix socket, sends `AUTHENTICATE`, waits for response, and logs details to `~/face_unlock/logs/pam_auth.log`. It is intended for the enrolled `dk` account; other users continue through normal password authentication.
 
 Verify script permissions:
 ```bash
@@ -432,12 +423,13 @@ pamtester -v face-unlock-test dk authenticate
 
 ## 13. GNOME Login & Lock-Screen Integration
 
-To enable face unlock at the GNOME login screen and lock screen, configure `/etc/pam.d/gdm-password`.
+Face unlock is installed in `/etc/pam.d/common-auth`, the shared PAM
+authentication stack. This makes it run first for GDM, lock-screen unlock,
+console login, `su`, and other services that include `common-auth`.
 
-Add the following line near the top of `/etc/pam.d/gdm-password`:
-```pam
-auth    sufficient    pam_exec.so    /home/dk/face_unlock/bin/pam_face_check
-```
+Because GDM uses `gdm-password` for both the power-on login screen and the
+GNOME lock screen, face unlock is attempted in both places. If the match
+fails, the regular password prompt remains available.
 
 If face authentication succeeds, GDM unlocks immediately. If it fails or times out, PAM falls back seamlessly to standard password input.
 
@@ -445,12 +437,8 @@ If face authentication succeeds, GDM unlocks immediately. If it fails or times o
 
 ## 14. Sudo Authentication Integration
 
-To enable face authentication for terminal `sudo` commands, modify `/etc/pam.d/sudo`.
-
-Add line to `/etc/pam.d/sudo`:
-```pam
-auth    sufficient    pam_exec.so    quiet    /home/dk/face_unlock/bin/pam_face_check
-```
+`/etc/pam.d/gdm-password` and `/etc/pam.d/sudo` use the shared stack and do
+not need separate face-authentication entries.
 
 Test sudo authentication:
 ```bash
@@ -501,8 +489,8 @@ AUTHENTICATE\n
 ```
 
 ### Response Payloads:
-- `SUCCESS\n`: Face recognized and liveness verified.
-- `FAIL\n`: Face unverified, liveness failed, or timeout.
+- `SUCCESS\n`: Face recognized above the similarity threshold.
+- `FAIL\n`: Face unverified or recognition timed out.
 - `INVALID\n`: Unrecognized socket command.
 
 ---
@@ -532,7 +520,7 @@ AUTHENTICATE\n
 
 ## 19. Systemd Service Setup
 
-Systemd service file location: `/etc/systemd/system/face-unlock.service`
+Systemd service template: [`systemd/face-unlock.service`](systemd/face-unlock.service), installed as `/etc/systemd/system/face-unlock.service`.
 
 ```ini
 [Unit]
@@ -558,11 +546,10 @@ WantedBy=multi-user.target
 
 ### Management Commands:
 ```bash
-# Reload systemd configuration
+# Install/update the boot service, reload systemd, and start it now
+sudo install -m 0644 systemd/face-unlock.service /etc/systemd/system/face-unlock.service
 sudo systemctl daemon-reload
-
-# Start the face unlock service
-sudo systemctl start face-unlock.service
+sudo systemctl enable --now face-unlock.service
 
 # Check service status
 sudo systemctl status face-unlock.service
@@ -572,9 +559,6 @@ sudo systemctl stop face-unlock.service
 
 # Restart the service
 sudo systemctl restart face-unlock.service
-
-# Enable automatic startup on system boot
-sudo systemctl enable face-unlock.service
 
 # View live service log stream
 sudo journalctl -u face-unlock.service -f
@@ -593,7 +577,7 @@ To guarantee hardware privacy and low energy consumption:
        ▼
 [ Opening Camera ] ──> Acquire /dev/video0 (LED On)
        │
-       │  Execute YuNet + SFace + Liveness
+       │  Execute YuNet + SFace similarity matching
        ▼
 [ Complete ]   ──────> Release /dev/video0 (LED Off)
        │
@@ -710,7 +694,7 @@ with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
 6. YuNet detects face and crops aligned bounding box.
 7. SFace extracts 128-dimensional embedding vector.
 8. Cosine similarity score calculated against `face_embedding.npy`.
-9. Liveness module checks facial movement delta.
+9. SFace cosine similarity is checked against the enrolled template.
 10. On success: socket returns `SUCCESS`, UI transitions to `SUCCESS`, camera powers OFF, PAM returns `0` (User authenticated).
 11. On failure/timeout: socket returns `FAIL`, UI transitions to `FAIL`, camera powers OFF, PAM returns `1` (Falls back to password).
 
@@ -726,9 +710,7 @@ with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
 UI STATE: AUTHENTICATING
 Opening camera...
 Camera active
-Starting passive liveness...
-Liveness movement: 0.111
-LIVENESS PASSED
+Similarity recognition mode
 Best similarity: 0.8897
 AUTHENTICATION SUCCESS
 UI STATE: SUCCESS
@@ -744,8 +726,7 @@ Exit code: 0
 UI STATE: AUTHENTICATING
 Opening camera...
 Camera active
-Starting passive liveness...
-LIVENESS FAILED
+Best similarity: 0.3210
 AUTHENTICATION FAILED
 UI STATE: FAIL
 Camera released

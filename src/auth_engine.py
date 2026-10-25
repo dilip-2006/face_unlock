@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import random
 import time
 from pathlib import Path
 
@@ -30,9 +29,7 @@ CAMERA = "/dev/video0"
 
 RECOGNITION_THRESHOLD = 0.40
 
-MOVEMENT_THRESHOLD = 0.18
-
-LIVENESS_TIMEOUT = 5.0
+RECOGNITION_TIMEOUT = 2.0
 
 
 # ============================================================
@@ -107,25 +104,19 @@ if not cap.isOpened():
 
 
 # ============================================================
-# Liveness challenge
+# Face recognition
 # ============================================================
-
-challenge = random.choice([
-    "LEFT",
-    "RIGHT"
-])
 
 print()
 print("========================================")
 print("       FACE AUTHENTICATION")
 print("========================================")
 print()
-print("Challenge:", challenge)
+print("Similarity-based identity matching")
 print()
 
 
-baseline = None
-liveness_passed = False
+verification_started = True
 
 start_time = time.time()
 
@@ -168,67 +159,6 @@ while True:
 
 
         # ----------------------------------------------------
-        # Liveness
-        # ----------------------------------------------------
-
-        left_eye = np.array([
-            face[4],
-            face[5]
-        ])
-
-        right_eye = np.array([
-            face[6],
-            face[7]
-        ])
-
-        nose = np.array([
-            face[8],
-            face[9]
-        ])
-
-
-        eye_center = (
-            left_eye + right_eye
-        ) / 2.0
-
-
-        eye_distance = np.linalg.norm(
-            right_eye - left_eye
-        )
-
-
-        if eye_distance > 1:
-
-            nose_position = (
-                nose[0] - eye_center[0]
-            ) / eye_distance
-
-
-            if baseline is None:
-
-                baseline = nose_position
-
-
-            movement = (
-                nose_position - baseline
-            )
-
-
-            if challenge == "LEFT":
-
-                if movement < -MOVEMENT_THRESHOLD:
-
-                    liveness_passed = True
-
-
-            elif challenge == "RIGHT":
-
-                if movement > MOVEMENT_THRESHOLD:
-
-                    liveness_passed = True
-
-
-        # ----------------------------------------------------
         # Draw
         # ----------------------------------------------------
 
@@ -242,20 +172,10 @@ while True:
 
 
     # ========================================================
-    # Display liveness state
+    # Display recognition state
     # ========================================================
 
-    if not liveness_passed:
-
-        message = (
-            f"TURN {challenge}"
-        )
-
-    else:
-
-        message = (
-            "LIVENESS OK - VERIFYING..."
-        )
+    message = "VERIFYING IDENTITY..."
 
 
     cv2.putText(
@@ -273,7 +193,7 @@ while True:
     # Recognition
     # ========================================================
 
-    if liveness_passed and faces is not None:
+    if verification_started and faces is not None:
 
         aligned_face = recognizer.alignCrop(
             frame,
@@ -370,10 +290,10 @@ while True:
     # Timeout
     # ========================================================
 
-    if time.time() - start_time > LIVENESS_TIMEOUT:
+    if time.time() - start_time > RECOGNITION_TIMEOUT:
 
         print()
-        print("LIVENESS TIMEOUT")
+        print("RECOGNITION TIMEOUT")
         print()
 
         break

@@ -33,15 +33,13 @@ CAMERA = "/dev/video0"
 
 RECOGNITION_THRESHOLD = 0.40
 
-LIVENESS_TIMEOUT = 5.0
+RECOGNITION_TIMEOUT = 1.0
 
-RECOGNITION_TIMEOUT = 2.0
+CAMERA_WARMUP_FRAMES = 0
 
-# Minimum normalized head-position variation
-MOVEMENT_THRESHOLD = 0.08
-
-# Number of useful movement samples required
-MIN_MOVEMENT_SAMPLES = 4
+# Smaller detector input reduces per-frame inference time while the original
+# camera frame is still used for SFace alignment and identity matching.
+DETECTOR_INPUT_SIZE = (320, 240)
 
 
 # ============================================================
@@ -129,12 +127,18 @@ def open_camera():
 
     camera.set(
         cv2.CAP_PROP_FRAME_WIDTH,
-        1280
+        640
     )
 
     camera.set(
         cv2.CAP_PROP_FRAME_HEIGHT,
-        720
+        480
+    )
+
+    # Keep only the newest frame so authentication never processes stale data.
+    camera.set(
+        cv2.CAP_PROP_BUFFERSIZE,
+        1
     )
 
     camera.set(
@@ -153,6 +157,10 @@ def open_camera():
         camera = None
 
         return False
+
+    # Discard the first camera frames while exposure/focus settles.
+    for _ in range(CAMERA_WARMUP_FRAMES):
+        camera.read()
 
     print(
         "Camera active",
@@ -239,14 +247,17 @@ recognizer = cv2.FaceRecognizerSF.create(
 
 def get_face(frame):
 
-    height, width = frame.shape[:2]
-
-    detector.setInputSize(
-        (width, height)
+    frame_height, frame_width = frame.shape[:2]
+    detector_frame = cv2.resize(
+        frame,
+        DETECTOR_INPUT_SIZE,
+        interpolation=cv2.INTER_LINEAR
     )
 
+    detector.setInputSize(DETECTOR_INPUT_SIZE)
+
     _, faces = detector.detect(
-        frame
+        detector_frame
     )
 
     if faces is None:
@@ -257,6 +268,16 @@ def get_face(frame):
 
         return None
 
+    # Map the detector result back to the original frame for SFace alignment.
+    scale_x = frame_width / DETECTOR_INPUT_SIZE[0]
+    scale_y = frame_height / DETECTOR_INPUT_SIZE[1]
+
+    faces = faces.copy()
+    for index in (0, 2, 4, 6, 8, 10, 12):
+        faces[:, index] *= scale_x
+    for index in (1, 3, 5, 7, 9, 11, 13):
+        faces[:, index] *= scale_y
+
     # Select largest face
 
     return max(
@@ -266,10 +287,18 @@ def get_face(frame):
 
 
 # ============================================================
-# Passive liveness
+# Face recognition
 # ============================================================
 
 def perform_liveness():
+
+    # Kept as a compatibility shim for older callers. Face unlock no
+    # longer performs passive movement or directional liveness checks.
+    print(
+        "Liveness checks disabled; using similarity recognition",
+        flush=True
+    )
+    return True
 
     print(
         "Starting passive liveness...",
@@ -522,6 +551,14 @@ def recognize_face():
             similarity
         )
 
+        # Do not wait out the timeout after a confident match.
+        if similarity >= RECOGNITION_THRESHOLD:
+            print(
+                f"Best similarity: {similarity:.4f}",
+                flush=True
+            )
+            return True
+
 
     print(
         f"Best similarity: "
@@ -558,19 +595,9 @@ def authenticate():
 
     try:
 
-        # ----------------------------------------------------
-        # Liveness
-        # ----------------------------------------------------
-
-        if not perform_liveness():
-
-            set_ui_state("FAIL")
-            return False
-
-        # ----------------------------------------------------
-        # Face recognition
-        # ----------------------------------------------------
-
+        # Authentication is based only on similarity to the enrolled
+        # SFace embedding. No directional or active-liveness challenge
+        # is required.
         result = recognize_face()
 
         if result:
@@ -676,7 +703,7 @@ print(
 )
 
 print(
-    "Passive liveness mode",
+    "Similarity recognition mode",
     flush=True
 )
 
